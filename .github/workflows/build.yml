@@ -1,4 +1,4 @@
-﻿name: Build
+name: Build
 
 on:
   push:
@@ -19,8 +19,10 @@ jobs:
             os: windows-latest
             cmake_args: -G "Visual Studio 17 2022" -A x64
             artifact: windows-x64
-          - name: macOS Intel
-            os: macos-13
+          # macos-13 was retired in December 2025. macos-15 is an arm64
+          # runner; CMAKE_OSX_ARCHITECTURES cross-compiles the Intel slice.
+          - name: macOS Intel (cross-compiled)
+            os: macos-15
             cmake_args: -G Xcode -DCMAKE_OSX_ARCHITECTURES=x86_64
             artifact: macos-intel
 
