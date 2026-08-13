@@ -1,0 +1,38 @@
+﻿# Build output
+build/
+Build/
+cmake-build-*/
+dist/
+out/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake.stamp*
+
+# Fetched dependencies (JUCE and Catch2 are downloaded by CMake at configure time)
+_deps/
+JUCE/
+Catch2/
+
+# IDE / editor
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.sln
+*.vcxproj*
+
+# OS cruft
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# Archives
+*.zip
+*.tar.gz
+*.dmg

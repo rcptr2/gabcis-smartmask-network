@@ -1,0 +1,50 @@
+﻿name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows x64
+            os: windows-latest
+            cmake_args: -G "Visual Studio 17 2022" -A x64
+            artifact: windows-x64
+          - name: macOS Intel
+            os: macos-13
+            cmake_args: -G Xcode -DCMAKE_OSX_ARCHITECTURES=x86_64
+            artifact: macos-intel
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # JUCE's VST3 POST_BUILD steps do not escape apostrophes, so the build
+      # directory is kept outside the source tree on every platform.
+      - name: Configure
+        run: cmake -S . -B ${{ runner.temp }}/build ${{ matrix.cmake_args }} -DSMARTMASK_BUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build ${{ runner.temp }}/build --config Release --target SmartMaskNetworkPlugin_VST3
+
+      - name: Collect VST3
+        shell: bash
+        run: |
+          mkdir -p "${{ runner.temp }}/artifact"
+          find "${{ runner.temp }}/build" -name '*.vst3' -type d -path '*Release*' \
+            -exec cp -R {} "${{ runner.temp }}/artifact/" \;
+          ls -la "${{ runner.temp }}/artifact"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SmartMaskNetwork-${{ matrix.artifact }}
+          path: ${{ runner.temp }}/artifact
+          if-no-files-found: error
